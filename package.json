@@ -20,5 +20,8 @@
     "postcss": "^8.4.38",
     "autoprefixer": "^10.4.16",
     "styled-components": "^6.1.8"
-  }
+  },
+  "files": [
+    "components/Footer.js"
+  ]
 }

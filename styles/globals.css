@@ -2,3 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 /* ...existing code or custom styles... */
+
+.parallax-footer {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+@media (max-width: 1024px) {
+  .parallax-footer {
+    background-attachment: scroll;
+  }
+}
