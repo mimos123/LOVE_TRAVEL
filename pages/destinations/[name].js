@@ -75,9 +75,12 @@ function InfoCard({ icon, label, value }) {
   );
 }
 
-function PackageCard({ title, days, location, description, price, oldPrice, image, sale }) {
+function PackageCard({ title, days, location, description, price, oldPrice, image, sale, onClick, onBack }) {
   return (
-    <div className="bg-white rounded-xl shadow p-4 flex flex-col w-full max-w-xs">
+    <div
+      className="bg-white rounded-xl shadow p-4 flex flex-col w-full max-w-xs cursor-pointer hover:shadow-lg transition"
+      onClick={onClick}
+    >
       <div className="relative">
         <img src={image} alt={title} className="rounded-lg w-full h-32 object-cover mb-3" />
         {sale && (
@@ -98,16 +101,33 @@ function PackageCard({ title, days, location, description, price, oldPrice, imag
           <span className="line-through text-gray-400 text-sm">TND {oldPrice}</span>
         )}
       </div>
-      <button className="bg-[#7B61FF] text-white rounded-lg py-2 font-semibold hover:bg-[#6a4ee6] transition">
+      <button
+        className="bg-[#7B61FF] text-white rounded-lg py-2 font-semibold hover:bg-[#6a4ee6] transition"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onClick) onClick();
+        }}
+      >
         Details
       </button>
+      {onBack && (
+        <button
+          className="bg-gray-200 text-gray-700 font-semibold py-2 px-6 rounded-lg hover:bg-gray-300 transition mt-2"
+          onClick={(e) => {
+            e.stopPropagation();
+            onBack();
+          }}
+        >
+          Back to Packages
+        </button>
+      )}
     </div>
   );
 }
 
 export default function DestinationDetails() {
   const router = useRouter();
-  const { name } = router.query;
+  const { name, package: packageQuery } = router.query;
   const destination = destinations.find(
     (d) => d.name === (name || "").toLowerCase()
   );
@@ -122,6 +142,46 @@ export default function DestinationDetails() {
         >
           Back to Destinations
         </button>
+      </div>
+    );
+  }
+
+  // If package query param is present, show only that package
+  if (packageQuery) {
+    const pkg = destination.packages.find(
+      (p) =>
+        p.title.toLowerCase().replace(/\s+/g, "-") ===
+        packageQuery.toLowerCase()
+    );
+    if (!pkg) {
+      return (
+        <div className="flex flex-col min-h-screen items-center justify-center">
+          <h1 className="text-2xl font-bold mb-4">Package Not Found</h1>
+          <button
+            className="bg-[#7B61FF] text-white px-4 py-2 rounded"
+            onClick={() => router.push(`/destinations/${destination.name}`)}
+          >
+            Back to Packages
+          </button>
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col min-h-screen bg-gray-50">
+        <div className="w-full h-80 relative">
+          <img
+            src={pkg.image}
+            alt={pkg.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <h1 className="text-white text-4xl font-extrabold">{pkg.title}</h1>
+          </div>
+        </div>
+        <main className="flex flex-col items-center py-12 flex-1 w-full">
+          <PackageCard {...pkg} onBack={() => router.push(`/destinations/${destination.name}`)} />
+        </main>
+        <Footer />
       </div>
     );
   }
@@ -190,7 +250,17 @@ export default function DestinationDetails() {
           </div>
           <div className="flex flex-col md:flex-row gap-6 justify-center">
             {destination.packages.map((pkg, idx) => (
-              <PackageCard key={idx} {...pkg} />
+              <PackageCard
+                key={idx}
+                {...pkg}
+                onBack={null}
+                onClick={() =>
+                  router.push({
+                    pathname: `/destinations/${destination.name}`,
+                    query: { package: pkg.title.toLowerCase().replace(/\s+/g, "-") },
+                  })
+                }
+              />
             ))}
           </div>
         </div>
