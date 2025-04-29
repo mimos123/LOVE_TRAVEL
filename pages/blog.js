@@ -1,45 +1,45 @@
 import Image from "next/image";
-
-const articles = [
-  {
-    title: "Plan the Perfect Vacation",
-    date: "April 7, 2023",
-    description:
-      "Planning a vacation can be overwhelming, but this post offers a step-by-step guide to help readers create a comprehensive travel itinerary. From choosing a destination to booking accommodations and activities, readers will learn how to plan a stress-free and enjoyable trip.",
-    image:
-      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-    link: "#",
-  },
-  {
-    title: "Explore the Wonders",
-    date: "April 7, 2023",
-    description:
-      "Must-see destinations and experiences, including wildlife and cultural experiences.",
-    image:
-      "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
-    link: "#",
-  },
-  {
-    title: "Traveling on a Budget",
-    date: "April 7, 2023",
-    description:
-      "Practical advice for travelers who want to see the world without breaking the bank.",
-    image:
-      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=600&q=80",
-    link: "#",
-  },
-  {
-    title: "Must-See Landmarks",
-    date: "April 7, 2023",
-    description:
-      "Iconic landmarks that make Europe one of the world’s most popular travel destinations.",
-    image:
-      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
-    link: "#",
-  },
-];
+import { articles } from "../lib/blogData";
+import { useState, useRef, useEffect } from "react";
 
 export default function Blog() {
+  const [openSlug, setOpenSlug] = useState(null);
+  const modalRef = useRef();
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (openSlug) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [openSlug]);
+
+  // Close on click outside
+  useEffect(() => {
+    if (!openSlug) return;
+    function handle(e) {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        setOpenSlug(null);
+      }
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [openSlug]);
+
+  // Close on ESC
+  useEffect(() => {
+    if (!openSlug) return;
+    function handle(e) {
+      if (e.key === "Escape") setOpenSlug(null);
+    }
+    document.addEventListener("keydown", handle);
+    return () => document.removeEventListener("keydown", handle);
+  }, [openSlug]);
+
+  const openArticle = articles.find(a => a.slug === openSlug);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Hero Section with CSS Parallax */}
@@ -63,7 +63,7 @@ export default function Blog() {
       <main className="flex flex-col items-center justify-center flex-1 py-16">
         <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-10 px-4">
           {articles.map((article, idx) => (
-            <div key={idx} className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col">
+            <div key={article.slug} className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col">
               <div className="relative w-full h-56">
                 <Image
                   src={article.image}
@@ -81,12 +81,12 @@ export default function Blog() {
                 </span>
                 <h3 className="text-xl font-extrabold mb-2">{article.title}</h3>
                 <p className="text-gray-700 mb-6 flex-1">{article.description}</p>
-                <a
-                  href={article.link}
+                <button
                   className="inline-block bg-indigo-600 text-white font-semibold rounded px-5 py-2 text-sm hover:bg-indigo-700 transition self-start"
+                  onClick={() => setOpenSlug(article.slug)}
                 >
                   Read More
-                </a>
+                </button>
               </div>
             </div>
           ))}
@@ -150,6 +150,96 @@ export default function Blog() {
           </div>
         </div>
       </footer>
+
+      {/* Popup Modal */}
+      {openArticle && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70">
+          <div
+            ref={modalRef}
+            className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-2 my-8 flex flex-col overflow-y-auto"
+            style={{ maxHeight: "90vh" }}
+          >
+            {/* Close button */}
+            <button
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold z-10"
+              onClick={() => setOpenSlug(null)}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            {/* Header */}
+            <div className="bg-gray-100 pb-4 pt-8 flex flex-col items-center rounded-t-2xl">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 text-center mb-2" style={{fontFamily: "Poppins, sans-serif"}}>
+                {openArticle.title}
+              </h1>
+              <div className="text-gray-500 text-sm mb-2">{openArticle.date}</div>
+            </div>
+            {/* Main image */}
+            <div className="flex justify-center mt-2 px-4">
+              <div className="bg-white rounded-2xl shadow-lg border-4 border-blue-100 p-2 w-full">
+                <Image
+                  src={openArticle.image}
+                  alt={openArticle.title}
+                  width={800}
+                  height={400}
+                  className="rounded-xl object-cover w-full h-[180px] md:h-[220px]"
+                  style={{background: "#eee"}}
+                  priority
+                />
+              </div>
+            </div>
+            {/* Article content */}
+            <div className="px-6 pt-6 pb-2 flex-1">
+              <div className="text-gray-700 text-base leading-relaxed mb-8">
+                <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: openArticle.content }} />
+              </div>
+              {/* Testimonial box */}
+              <div className="bg-white rounded-xl p-6 mb-8 shadow flex flex-col items-center border border-gray-200">
+                <p className="text-gray-700 text-base mb-4 text-center italic">
+                  I recently used the services of thisTravel Agency for my trip to Europe and I couldn't be happier.
+                  The team took care of everything from flights to hotels to tours, making my trip planning stress-free.
+                  They were very knowledgeable about the destinations and gave great recommendations on things to do and see.
+                </p>
+                <div className="flex items-center gap-3">
+                  <Image src="https://randomuser.me/api/portraits/women/44.jpg" alt="Emily Stuart" width={48} height={48} className="rounded-full" />
+                  <div>
+                    <div className="font-bold text-gray-900">Emily Stuart</div>
+                    <div className="text-gray-500 text-xs">Traveler</div>
+                    <div className="text-yellow-400 text-lg leading-none">★ ★ ★ ★ ★</div>
+                  </div>
+                </div>
+              </div>
+              {/* Extra images row */}
+              <div className="flex flex-col md:flex-row gap-6 mb-8">
+                { [
+                  "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+                  "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
+                ].map((img, i) => (
+                  <div key={i} className="flex-1 rounded-xl overflow-hidden shadow">
+                    <Image
+                      src={img}
+                      alt={`Extra ${i + 1}`}
+                      width={400}
+                      height={200}
+                      className="object-cover w-full h-40"
+                      style={{background: "#eee"}}
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Back link */}
+              <div className="mb-2 text-center">
+                <button
+                  className="text-indigo-600 hover:underline"
+                  onClick={() => setOpenSlug(null)}
+                >
+                  ← Back to Blog
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
