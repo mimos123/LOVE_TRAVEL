@@ -23,33 +23,57 @@ export default function Home() {
 
   return (
     <>
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 flex flex-col items-center justify-center px-4 pt-22">
-        <section className="w-full max-w-2xl text-center py-16 rounded-3xl bg-white/80 shadow-xl">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-700 mb-4">
-            Explore the World with <span className="text-pink-500">LOVE TRAVEL</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-700 mb-8">
-            Discover amazing destinations, book unique experiences, and make memories that last a lifetime.
-          </p>
-          <a
-            href="#"
-            className="inline-block px-8 py-3 bg-pink-500 text-white font-semibold rounded-full shadow hover:bg-pink-600 transition"
-          >
-            Start Your Journey
-          </a>
-        </section>
-        <div className="mt-12 flex flex-wrap justify-center gap-8">
-          <div className="w-64 bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-blue-700 mb-2">Exotic Destinations</h2>
-            <p className="text-gray-600">From Bali to Paris, find your dream getaway with us.</p>
-          </div>
-          <div className="w-64 bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-blue-700 mb-2">Best Price Guarantee</h2>
-            <p className="text-gray-600">We offer the best deals for flights, hotels, and tours.</p>
-          </div>
-          <div className="w-64 bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-blue-700 mb-2">24/7 Support</h2>
-            <p className="text-gray-600">Our team is here to help you anytime, anywhere.</p>
+      <main className="flex flex-col min-h-screen bg-gradient-to-br from-blue-20 to-blue-50">
+        {/* Hero Section with CSS Parallax */}
+        <div
+          className="w-full h-[420px] md:h-[600px] parallax relative flex items-center"
+          style={{
+            backgroundImage: 'url("/worldindots.png")',
+            backgroundAttachment: "fixed",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+          }}
+        >
+          <div className="absolute inset-0" style={{ backgroundColor: "#F2F2F2", opacity: 0.85 }}></div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between w-full h-full px-6 md:px-20">
+            {/* Left: Text */}
+            <div className="flex-1 flex flex-col justify-center items-start pt-10 md:pt-0 md:pr-4 md:items-center">
+              <span className="text-gray-400 text-base md:text-lg font-semibold mb-3 tracking-wide">
+                LOVE TRAVEL THEME
+              </span>
+              <h1 className="text-3xl md:text-5xl font-extrabold text-black mb-2 leading-tight" style={{fontFamily: "Poppins, sans-serif"}}>
+                <span className="relative inline-block">
+                  <span className="z-10 relative">Adventure</span>
+                  <span
+                    className="absolute left-0 bottom-1 w-full h-2"
+                    style={{
+                      background: "#FFC700",
+                      zIndex: 0,
+                      borderRadius: "4px",
+                    }}
+                  ></span>
+                </span>
+                <span className="text-black">&nbsp;&amp;</span>
+                <br />
+                <span className="text-black">Experience</span>
+                <br />
+                <span className="text-black">The Travel !</span>
+              </h1>
+            </div>
+            {/* Right: Pill Image */}
+            <div className="flex-1 flex justify-center items-center mt-4 md:mt-0 md:ml-[-32px]">
+              <div className="w-[220px] h-[340px] md:w-[220px] md:h-[420px] bg-white shadow-lg overflow-hidden rounded-[100px] md:rounded-[150px] flex items-center justify-center">
+                <Image
+                  src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
+                  alt="Travel"
+                  width={300}
+                  height={420}
+                  className="object-cover w-full h-full"
+                  priority
+                />
+              </div>
+            </div>
           </div>
         </div>
       </main>
