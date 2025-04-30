@@ -203,7 +203,7 @@ function Navbar({ onLogin, onSignup }) {
       }`}
       style={{ boxShadow: "0 2px 8px 0 rgb(0 0 0 / 0.04)" }}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1">
         <Image src="/Logo.png" alt="Logo" width={120} height={40} priority />
       </div>
       <ul className="flex items-center gap-6 font-medium text-black relative">
