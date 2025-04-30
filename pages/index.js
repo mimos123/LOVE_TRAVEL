@@ -47,7 +47,7 @@ export default function Home() {
             {/* Left: Text */}
             <div className="flex-1 flex flex-col justify-center items-start pt-10 md:pt-0 md:pr-4 md:items-center">
               <span className="text-gray-400 text-base md:text-lg font-semibold mb-3 tracking-wide">
-                LOVE TRAVEL THEME
+                LOVE TRAVEL AGENCY
               </span>
               <h1 className="text-3xl md:text-5xl font-extrabold text-black mb-2 leading-tight" style={{fontFamily: "Poppins, sans-serif"}}>
                 <span className="relative inline-block">
