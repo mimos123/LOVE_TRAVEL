@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 import json
-from .models import Destination, Package
+from .models import Destination, Package, Hotel, Activity, Transport
 from django.core.serializers import serialize
 from django.views.decorators.http import require_GET
 
@@ -66,16 +66,71 @@ def destinations_list(request):
 @require_GET
 def packages_list(request):
     packages = Package.objects.select_related('destination').all()
-    data = [
-        {
+    data = []
+    for pkg in packages:
+        # Handle both FileField/ImageField and string for destination.image
+        dest_image = pkg.destination.image
+        if hasattr(dest_image, "name"):
+            image_url = f"/destinations/{dest_image.name.split('/')[-1]}"
+        elif isinstance(dest_image, str) and dest_image:
+            # If it's already a string (maybe a filename or URL)
+            if dest_image.startswith("/destinations/") or dest_image.startswith("http"):
+                image_url = dest_image
+            else:
+                image_url = f"/destinations/{dest_image.split('/')[-1]}"
+        else:
+            image_url = ""
+        data.append({
             "title": pkg.name,
             "country": pkg.destination.country,
             "description": pkg.destination.description,
-            # Use only the filename for public/destinations/
-            "image": f"/destinations/{pkg.destination.image.name.split('/')[-1]}" if pkg.destination.image else "",
+            "image": image_url,
             "price": float(pkg.total_price) if pkg.total_price else 0,
-        }
-        for pkg in packages
+            # Add other fields as needed
+        })
+    return JsonResponse(data, safe=False)
+
+def current_user(request):
+    if request.user.is_authenticated:
+        return JsonResponse({"username": request.user.username})
+    return JsonResponse({}, status=401)
+
+@require_GET
+def hotels_list(request):
+    destination_id = request.GET.get('destination')
+    if destination_id:
+        hotels = Hotel.objects.filter(destination__id=destination_id)
+    else:
+        hotels = Hotel.objects.all()
+    data = [
+        {"name": h.name, "price": h.price, "destination": h.destination.name}
+        for h in hotels
+    ]
+    return JsonResponse(data, safe=False)
+
+@require_GET
+def activities_list(request):
+    destination_id = request.GET.get('destination')
+    if destination_id:
+        activities = Activity.objects.filter(destination__id=destination_id)
+    else:
+        activities = Activity.objects.all()
+    data = [
+        {"name": a.name, "price": a.price, "destination": a.destination.name}
+        for a in activities
+    ]
+    return JsonResponse(data, safe=False)
+
+@require_GET
+def transports_list(request):
+    destination_id = request.GET.get('destination')
+    if destination_id:
+        transports = Transport.objects.filter(destination__id=destination_id)
+    else:
+        transports = Transport.objects.all()
+    data = [
+        {"name": t.name, "price": t.price, "destination": t.destination.name}
+        for t in transports
     ]
     return JsonResponse(data, safe=False)
 

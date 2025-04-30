@@ -259,13 +259,25 @@ export default function Packages() {
             ) : view === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-8">
                 {paginatedPackages.map((pkg, idx) => (
-                  <PackageCard key={idx} {...pkg} destination_image={pkg.destination_image} />
+                  <PackageCard
+                    key={pkg.id || idx}
+                    title={pkg.title}
+                    country={pkg.country}
+                    duration={pkg.duration}
+                    image={pkg.image}
+                    description={pkg.description}
+                    price={pkg.price}
+                    oldPrice={pkg.oldPrice}
+                    sale={pkg.sale}
+                    currency={pkg.currency}
+                    destination_image={pkg.destination_image}
+                  />
                 ))}
               </div>
             ) : (
               <div className="flex flex-col gap-8">
                 {paginatedPackages.map((pkg, idx) => (
-                  <div key={idx} className="flex flex-col md:flex-row bg-white rounded-2xl shadow-md overflow-hidden h-[220px]">
+                  <div key={pkg.id || idx} className="flex flex-col md:flex-row bg-white rounded-2xl shadow-md overflow-hidden h-[220px]">
                     <div className="md:w-1/3 w-full h-48 md:h-full relative">
                       <img
                         src={pkg.image}

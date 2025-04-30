@@ -6,6 +6,7 @@ import packagesData from "../data/packagesData";
 export default function Home() {
   const [showNavbar, setShowNavbar] = useState(true);
   const lastScrollY = useRef(0);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +22,29 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    // Fetch current user info from backend
+    fetch("http://localhost:8000/api/current_user/", {
+      credentials: "include",
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.username) setUser(data);
+        else setUser(null);
+      })
+      .catch(() => setUser(null)); // Prevent crash on fetch error
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch("http://localhost:8000/logout/", {
+      method: "POST",
+      credentials: "include",
+    });
+    setUser(null);
+    // Optionally reload or redirect
+    window.location.reload();
+  };
+
   // Select 3 random packages from packagesData
   const [randomPackages, setRandomPackages] = useState([]);
   useEffect(() => {
@@ -29,7 +53,32 @@ export default function Home() {
   }, []);
 
   return (
-    <>
+    <div>
+      <header>
+        <div className="flex justify-between items-center p-4 bg-white shadow-md">
+          {/* Fix: Remove <a> inside <Link> */}
+          <Link href="/" className="text-xl font-bold">
+            Love Travel Agency
+          </Link>
+          {user ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span>Welcome, {user.username}</span>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div>
+              <Link href="/login">Login</Link>
+              {" | "}
+              <Link href="/signup">Sign Up</Link>
+            </div>
+          )}
+        </div>
+      </header>
       <main className="flex flex-col min-h-screen bg-gradient-to-br from-blue-20 to-blue-50">
         {/* Hero Section with CSS Parallax */}
         <div
@@ -236,6 +285,6 @@ export default function Home() {
         </div>
       </section>
       <Footer />
-    </>
+    </div>
   );
 }

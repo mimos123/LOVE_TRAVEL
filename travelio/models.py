@@ -4,7 +4,7 @@ class Destination(models.Model):
     name = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='destinations/', blank=True)
+    image = models.URLField(blank=True)  # Use URLField for Unsplash/web images
 
     def __str__(self):
         return self.name
