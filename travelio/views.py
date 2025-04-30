@@ -4,6 +4,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 import json
+from .models import Destination, Package
+from django.core.serializers import serialize
+from django.views.decorators.http import require_GET
 
 def time_view(request):
     now = datetime.now().isoformat()
@@ -45,4 +48,35 @@ def logout_user(request):
         logout(request)
         return JsonResponse({"message": "Logged out successfully"})
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+@require_GET
+def destinations_list(request):
+    destinations = Destination.objects.all()
+    data = [
+        {
+            "id": d.id,
+            "name": d.name,
+            "country": d.country,
+            "description": d.description,
+            "image": d.image.url if d.image else "",
+        }
+        for d in destinations
+    ]
+    return JsonResponse(data, safe=False)
+
+@require_GET
+def packages_list(request):
+    packages = Package.objects.select_related('destination').all()
+    data = [
+        {
+            "title": pkg.name,
+            "country": pkg.destination.country,
+            "description": pkg.destination.description,
+            # Use only the filename for public/destinations/
+            "image": f"/destinations/{pkg.destination.image.name.split('/')[-1]}" if pkg.destination.image else "",
+            "price": float(pkg.total_price) if pkg.total_price else 0,
+        }
+        for pkg in packages
+    ]
+    return JsonResponse(data, safe=False)
 

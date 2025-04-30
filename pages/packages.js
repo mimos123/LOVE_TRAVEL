@@ -1,21 +1,34 @@
 import Head from "next/head";
 import Footer from "../components/Footer";
-import { useState } from "react";
-import packagesData from "../data/packagesData";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
-function PackageCard({ title, country, duration, image, description, price, oldPrice, sale, currency }) {
-  // Use a dummy image if image is missing or empty
-  const imgSrc =
-    image && (image.startsWith("http://") || image.startsWith("https://") || image.startsWith("/"))
+function PackageCard({ title, country, duration, image, description, price, oldPrice, sale, currency, destination_image }) {
+  // Use destination_image from /public/destinations/ if available
+  let imgSrc = "";
+  if (destination_image) {
+    // If destination_image is just a filename, prepend /destinations/
+    imgSrc = destination_image.startsWith("http")
+      ? destination_image
+      : destination_image.startsWith("/destinations/")
+        ? destination_image
+        : `/destinations/${destination_image}`;
+  } else if (image) {
+    imgSrc = image.startsWith("http")
       ? image
-      : `https://dummyimage.com/600x300/cccccc/000000&text=${encodeURIComponent(title)}`;
+      : image.startsWith("/destinations/")
+        ? image
+        : `/destinations/${image}`;
+  } else {
+    imgSrc = `https://dummyimage.com/600x300/cccccc/000000&text=${encodeURIComponent(title)}`;
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col h-[420px]">
       <div className="relative w-full h-48">
         <Image
-          src={image}
+          src={imgSrc}
           alt={title}
           fill
           style={{ objectFit: "cover" }}
@@ -60,41 +73,22 @@ function PackageCard({ title, country, duration, image, description, price, oldP
 }
 
 export default function Packages() {
+  const [packagesData, setPackagesData] = useState([]);
   const [maxPrice, setMaxPrice] = useState(5000);
   const [view, setView] = useState("grid"); // "grid" or "list"
   const [page, setPage] = useState(1);
-  const [sortBy, setSortBy] = useState(null); // "price" | "name" | null
-  const [sortOrder, setSortOrder] = useState("asc"); // "asc" | "desc"
+  const router = useRouter();
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/packages/")
+      .then(res => res.json())
+      .then(data => setPackagesData(data))
+      .catch(() => setPackagesData([]));
+  }, []);
 
   const perPage = 4;
-
-  // Sorting logic
-  let sortedPackages = [...packagesData];
-  if (sortBy === "price") {
-    sortedPackages.sort((a, b) =>
-      sortOrder === "asc" ? a.price - b.price : b.price - a.price
-    );
-  } else if (sortBy === "name") {
-    sortedPackages.sort((a, b) =>
-      sortOrder === "asc"
-        ? a.title.localeCompare(b.title)
-        : b.title.localeCompare(a.title)
-    );
-  }
-
-  const totalPages = Math.ceil(sortedPackages.length / perPage);
-  const paginatedPackages = sortedPackages.slice((page - 1) * perPage, page * perPage);
-
-  // Handler for sort button click
-  const handleSort = (type) => {
-    if (sortBy === type) {
-      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortBy(type);
-      setSortOrder("asc");
-    }
-    setPage(1);
-  };
+  const totalPages = Math.ceil(packagesData.length / perPage);
+  const paginatedPackages = packagesData.slice((page - 1) * perPage, page * perPage);
 
   return (
     <>
@@ -123,24 +117,9 @@ export default function Packages() {
             <div className="flex gap-8">
               {/* Price Dropdown */}
               <div className="relative">
-                <button
-                  className={`flex items-center gap-1 text-white font-medium text-sm focus:outline-none ${sortBy === "price" ? "underline" : ""}`}
-                  onClick={() => handleSort("price")}
-                >
+                <button className="flex items-center gap-1 text-white font-medium text-sm focus:outline-none">
                   PRICE
-                  <svg
-                    className="w-4 h-4 ml-1 text-white transition-transform duration-200"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    style={{
-                      transform:
-                        sortBy === "price" && sortOrder === "desc"
-                          ? "rotate(180deg)"
-                          : "rotate(0deg)",
-                    }}
-                  >
+                  <svg className="w-4 h-4 ml-1 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -148,24 +127,9 @@ export default function Packages() {
               </div>
               {/* Name Dropdown */}
               <div className="relative">
-                <button
-                  className={`flex items-center gap-1 text-white font-medium text-sm focus:outline-none ${sortBy === "name" ? "underline" : ""}`}
-                  onClick={() => handleSort("name")}
-                >
+                <button className="flex items-center gap-1 text-white font-medium text-sm focus:outline-none">
                   NAME
-                  <svg
-                    className="w-4 h-4 ml-1 text-white transition-transform duration-200"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    style={{
-                      transform:
-                        sortBy === "name" && sortOrder === "desc"
-                          ? "rotate(180deg)"
-                          : "rotate(0deg)",
-                    }}
-                  >
+                  <svg className="w-4 h-4 ml-1 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -242,12 +206,12 @@ export default function Packages() {
                   <input
                     type="range"
                     min={0}
-                    max={10000}
+                    max={5000}
                     value={maxPrice}
                     onChange={e => setMaxPrice(Number(e.target.value))}
                     className="w-full"
                   />
-                  <span className="text-xs text-gray-500">{maxPrice} TND</span>
+                  <span className="text-xs text-gray-500">${maxPrice}</span>
                 </div>
                 <label className="flex items-center mt-2 text-xs">
                   <input type="checkbox" className="mr-2" />
@@ -280,14 +244,22 @@ export default function Packages() {
                   <label><input type="checkbox" className="mr-1" />5</label>
                 </div>
               </div>
+              <button
+                className="w-full mt-6 bg-[#7B61FF] text-white font-bold py-3 rounded-lg hover:bg-[#6a4ee6] transition"
+                onClick={() => router.push("/personalize")}
+              >
+                Create Your Journey
+              </button>
             </div>
           </aside>
           {/* Packages Grid/List */}
           <section className="flex-1">
-            {view === "grid" ? (
+            {paginatedPackages.length === 0 ? (
+              <div className="text-gray-500 text-xl">No packages found.</div>
+            ) : view === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-8">
                 {paginatedPackages.map((pkg, idx) => (
-                  <PackageCard key={idx} {...pkg} />
+                  <PackageCard key={idx} {...pkg} destination_image={pkg.destination_image} />
                 ))}
               </div>
             ) : (
