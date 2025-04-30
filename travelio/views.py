@@ -3,6 +3,7 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 import json
 from .models import Destination, Package, Hotel, Activity, Transport
 from django.core.serializers import serialize
@@ -15,16 +16,23 @@ def time_view(request):
 @csrf_exempt
 def register_user(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        username = data.get("username")
-        password = data.get("password")
-        email = data.get("email", "")
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            password = data.get("password")
+            email = data.get("email", "")
 
-        if User.objects.filter(username=username).exists():
-            return JsonResponse({"error": "Username already taken"}, status=400)
+            if not username or not password:
+                return JsonResponse({"error": "Username and password are required"}, status=400)
 
-        user = User.objects.create_user(username=username, email=email, password=password)
-        return JsonResponse({"message": "User registered successfully"})
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({"error": "Username already taken"}, status=400)
+
+            user = User.objects.create_user(username=username, email=email, password=password)
+            return JsonResponse({"message": "User registered successfully"})
+        except Exception as e:
+            print("Register error:", e)
+            return JsonResponse({"error": "Server error"}, status=500)
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 @csrf_exempt
@@ -48,6 +56,11 @@ def logout_user(request):
         logout(request)
         return JsonResponse({"message": "Logged out successfully"})
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+def current_user(request):
+    if request.user.is_authenticated:
+        return JsonResponse({"username": request.user.username})
+    return JsonResponse({}, status=401)
 
 @require_GET
 def destinations_list(request):
@@ -90,11 +103,6 @@ def packages_list(request):
         })
     return JsonResponse(data, safe=False)
 
-def current_user(request):
-    if request.user.is_authenticated:
-        return JsonResponse({"username": request.user.username})
-    return JsonResponse({}, status=401)
-
 @require_GET
 def hotels_list(request):
     destination_id = request.GET.get('destination')
@@ -133,4 +141,8 @@ def transports_list(request):
         for t in transports
     ]
     return JsonResponse(data, safe=False)
+
+@login_required
+def some_protected_view(request):
+    return JsonResponse({"message": "You are authenticated"})
 

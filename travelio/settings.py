@@ -26,7 +26,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True  # or whitelist specific domains with CORS_ALLOWED_ORIGINS
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 

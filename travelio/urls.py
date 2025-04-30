@@ -12,12 +12,10 @@ urlpatterns = [
     path('api/time/', views.time_view),
     path('api/destinations/', views.destinations_list),
     path('api/packages/', views.packages_list),
-    path('api/hotels/', views.hotels_list),         # <-- make sure this is plural
-    path('api/activities/', views.activities_list), # <-- make sure this is plural
-    path('api/transports/', views.transports_list), # <-- make sure this is plural
-    path("register/", views.register_user, name="register"),
-    path("login/", views.login_user, name="login"),
-    path("logout/", views.logout_user, name="logout"),
+    path('api/hotels/', views.hotels_list),
+    path('api/activities/', views.activities_list),
+    path('api/transports/', views.transports_list),
+    # Use only Django's default auth URLs for login/logout/password
     path('accounts/', include('django.contrib.auth.urls')),
     path("api/current_user/", views.current_user),
 ]

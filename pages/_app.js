@@ -162,7 +162,7 @@ const StyledWrapper = styled.div`
   }
 `;
 
-function Navbar({ onLogin, onSignup }) {
+function Navbar({ user, handleLogout }) {
   const [showNavbar, setShowNavbar] = useState(true);
   const [hovered, setHovered] = useState(null);
   const lastScrollY = useRef(0);
@@ -189,7 +189,6 @@ function Navbar({ onLogin, onSignup }) {
 
   const navItems = [
     { href: "/", label: "Home" },
-    { href: "/travel", label: "Travel" },
     { href: "/packages", label: "Packages" },
     { href: "/destinations", label: "Destinations" },
     { href: "/blog", label: "Blog" },
@@ -206,7 +205,7 @@ function Navbar({ onLogin, onSignup }) {
       <div className="flex items-center gap-1">
         <Image src="/Logo.png" alt="Logo" width={120} height={40} priority />
       </div>
-      <ul className="flex items-center gap-6 font-medium text-black relative">
+      <ul className="flex items-center gap-6 font-medium text-black relative m-0 p-0 list-none">
         {navItems.map((item, idx) => (
           <li
             key={item.href}
@@ -235,24 +234,107 @@ function Navbar({ onLogin, onSignup }) {
         ))}
       </ul>
       <div className="flex items-center gap-4">
-        <button
-          className="bg-indigo-500 text-white font-semibold rounded-md px-8 py-2 shadow hover:bg-indigo-600 transition"
-          onClick={onLogin}
-        >
-          Login
-        </button>
-        <button
-          className="bg-gray-200 text-black font-semibold rounded-md px-8 py-2 shadow hover:bg-gray-300 transition"
-          onClick={onSignup}
-        >
-          Create account
-        </button>
+        {user ? (
+          <>
+            <span className="ml-4 text-gray-700 font-semibold">Welcome, {user.username}</span>
+            <button
+              onClick={handleLogout}
+              className="ml-2 relative overflow-hidden bg-blue-600 text-white font-semibold rounded-md px-8 py-2 shadow transition"
+              style={{ position: "relative" }}
+              onMouseEnter={e => {
+                const ink = document.createElement("span");
+                ink.className = "inkdrop";
+                ink.style.left = e.nativeEvent.offsetX + "px";
+                ink.style.top = e.nativeEvent.offsetY + "px";
+                e.currentTarget.appendChild(ink);
+                setTimeout(() => ink.remove(), 600);
+              }}
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="relative overflow-hidden bg-blue-600 text-white font-semibold rounded-md px-8 py-2 shadow transition hover:bg-blue-700"
+              style={{ position: "relative" }}
+              onClick={() => window.location.href = "/login"}
+              onMouseEnter={e => {
+                const ink = document.createElement("span");
+                ink.className = "inkdrop";
+                ink.style.left = e.nativeEvent.offsetX + "px";
+                ink.style.top = e.nativeEvent.offsetY + "px";
+                e.currentTarget.appendChild(ink);
+                setTimeout(() => ink.remove(), 600);
+              }}
+            >
+              Login
+            </button>
+            <button
+              className="relative overflow-hidden bg-blue-600 text-white font-semibold rounded-md px-8 py-2 shadow transition hover:bg-blue-700"
+              style={{ position: "relative" }}
+              onClick={() => window.location.href = "/signup"}
+              onMouseEnter={e => {
+                const ink = document.createElement("span");
+                ink.className = "inkdrop";
+                ink.style.left = e.nativeEvent.offsetX + "px";
+                ink.style.top = e.nativeEvent.offsetY + "px";
+                e.currentTarget.appendChild(ink);
+                setTimeout(() => ink.remove(), 600);
+              }}
+            >
+              Create account
+            </button>
+          </>
+        )}
       </div>
+      <style jsx global>{`
+        .inkdrop {
+          position: absolute;
+          border-radius: 50%;
+          transform: scale(0);
+          animation: inkdrop 0.6s linear;
+          background: rgba(59, 130, 246, 0.3);
+          pointer-events: none;
+          width: 120px;
+          height: 120px;
+          z-index: 1;
+        }
+        @keyframes inkdrop {
+          to {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </nav>
   );
 }
 
 export default function App({ Component, pageProps }) {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/current_user/", {
+      credentials: "include",
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.username) setUser(data);
+        else setUser(null);
+      })
+      .catch(() => setUser(null));
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch("http://localhost:8000/logout/", {
+      method: "POST",
+      credentials: "include",
+    });
+    setUser(null);
+    window.location.reload();
+  };
+
   // Modal state
   const [modal, setModal] = useState(null); // 'login' | 'signup' | null
 
@@ -263,7 +345,9 @@ export default function App({ Component, pageProps }) {
 
   return (
     <>
-      <Navbar onLogin={openLogin} onSignup={openSignup} />
+      <header>
+        <Navbar user={user} handleLogout={handleLogout} />
+      </header>
       <div className="pt-22">
         <Component {...pageProps} />
       </div>
