@@ -54,11 +54,10 @@ def destinations_list(request):
     destinations = Destination.objects.all()
     data = [
         {
-            "id": d.id,
             "name": d.name,
-            "country": d.country,
             "description": d.description,
-            "image": d.image.url if d.image else "",
+            # If d.image is a URL string, just use it directly
+            "image": d.image if isinstance(d.image, str) else (d.image.url if d.image else ""),
         }
         for d in destinations
     ]
