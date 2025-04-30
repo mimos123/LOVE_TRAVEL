@@ -3,6 +3,11 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import Footer from "../components/Footer";
 
+// Import dummy data from data folder
+import hotelsData from "../data/hotelsData";
+import activitiesData from "../data/activitiesData";
+import transportsData from "../data/transportsData";
+
 export default function Personalize() {
   const router = useRouter();
   const [destinations, setDestinations] = useState([]);
@@ -21,29 +26,24 @@ export default function Personalize() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/destinations/")
-      .then(res => res.json())
-      .then(data => setDestinations(data))
-      .catch(() => setDestinations([]));
+    // Dummy destinations based on data in hotelsData, activitiesData, transportsData
+    // You can also create a destinationsData.js if you want
+    const allDestinations = [
+      ...new Set([
+        ...hotelsData.map(h => h.destination),
+        ...activitiesData.map(a => a.destination),
+        ...transportsData.map(t => t.destination),
+      ]),
+    ];
+    setDestinations(allDestinations.map(name => ({ name })));
   }, []);
 
-  // Fetch hotels, activities, transports for selected destination
+  // Filter hotels, activities, transports for selected destination from dummy data
   useEffect(() => {
     if (form.destination) {
-      fetch(`http://localhost:8000/api/hotels/?destination=${encodeURIComponent(form.destination)}`)
-        .then(res => res.json())
-        .then(data => setHotels(data))
-        .catch(() => setHotels([]));
-
-      fetch(`http://localhost:8000/api/activities/?destination=${encodeURIComponent(form.destination)}`)
-        .then(res => res.json())
-        .then(data => setActivities(data))
-        .catch(() => setActivities([]));
-
-      fetch(`http://localhost:8000/api/transports/?destination=${encodeURIComponent(form.destination)}`)
-        .then(res => res.json())
-        .then(data => setTransports(data))
-        .catch(() => setTransports([]));
+      setHotels(hotelsData.filter(h => h.destination === form.destination));
+      setActivities(activitiesData.filter(a => a.destination === form.destination));
+      setTransports(transportsData.filter(t => t.destination === form.destination));
     } else {
       setHotels([]);
       setActivities([]);
@@ -65,20 +65,8 @@ export default function Personalize() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    const res = await fetch("http://localhost:8000/api/packages/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: form.title,
-        destination: form.destination,
-        activity: form.activity,
-        hotel: form.hotel,
-        transport: form.transport,
-        total_price: totalPrice,
-      }),
-      credentials: "include",
-    });
-    if (res.ok) {
+    // Simulate API call or handle as needed
+    setTimeout(() => {
       setSuccess("Package created successfully!");
       setForm({
         title: "",
@@ -88,10 +76,7 @@ export default function Personalize() {
         transport: "",
         price: "",
       });
-    } else {
-      const data = await res.json().catch(() => ({}));
-      setError(data.error || "Failed to create package");
-    }
+    }, 500);
   };
 
   return (
