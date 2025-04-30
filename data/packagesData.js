@@ -108,6 +108,116 @@ const packagesData = [
     image: "https://images.pexels.com/photos/356844/pexels-photo-356844.jpeg?auto=compress&w=600&q=80",
     category: "festivals",
     duration: 7
+  },
+  {
+    id: 11,
+    title: "Northern Lights Adventure",
+    location: "Iceland",
+    price: 8990,
+    currency: "TND",
+    description: "Chase the magical Northern Lights in Iceland. Enjoy geothermal spas, glaciers, and unique volcanic landscapes.",
+    image: "https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&w=600&q=80",
+    category: "nature",
+    duration: 6
+  },
+  {
+    id: 12,
+    title: "Desert Safari",
+    location: "Dubai, UAE",
+    price: 4990,
+    currency: "TND",
+    description: "Experience the thrill of dune bashing, camel rides, and a night under the stars in the Arabian desert.",
+    image: "https://images.pexels.com/photos/248771/pexels-photo-248771.jpeg?auto=compress&w=600&q=80",
+    category: "adventure",
+    duration: 4
+  },
+  {
+    id: 13,
+    title: "Amazon Rainforest Expedition",
+    location: "Brazil",
+    price: 11200,
+    currency: "TND",
+    description: "Explore the biodiversity of the Amazon rainforest with guided jungle treks and river cruises.",
+    image: "https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg?auto=compress&w=600&q=80",
+    category: "wildlife",
+    duration: 8
+  },
+  {
+    id: 14,
+    title: "Alpine Ski Retreat",
+    location: "Swiss Alps",
+    price: 10250,
+    currency: "TND",
+    description: "Hit the slopes in the Swiss Alps. Enjoy world-class skiing, cozy lodges, and breathtaking mountain views.",
+    image: "https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&w=600&q=80",
+    category: "sports",
+    duration: 7
+  },
+  {
+    id: 15,
+    title: "City Lights Tour",
+    location: "New York, USA",
+    price: 7990,
+    currency: "TND",
+    description: "Discover the energy of New York City. Visit iconic landmarks, Broadway shows, and world-class museums.",
+    image: "https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&w=600&q=80",
+    category: "city",
+    duration: 5
+  },
+  {
+    id: 16,
+    title: "Safari & Beach Combo",
+    location: "Kenya & Zanzibar",
+    price: 13400,
+    currency: "TND",
+    description: "Combine thrilling safaris in Kenya with relaxing beach days in Zanzibar for the ultimate African adventure.",
+    image: "https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg?auto=compress&w=600&q=80",
+    category: "combo",
+    duration: 12
+  },
+  {
+    id: 17,
+    title: "Patagonia Trekking",
+    location: "Argentina & Chile",
+    price: 11900,
+    currency: "TND",
+    description: "Trek through the dramatic landscapes of Patagonia, with glaciers, lakes, and towering peaks.",
+    image: "https://images.pexels.com/photos/208701/pexels-photo-208701.jpeg?auto=compress&w=600&q=80",
+    category: "adventure",
+    duration: 10
+  },
+  {
+    id: 18,
+    title: "Bali Wellness Escape",
+    location: "Bali, Indonesia",
+    price: 6700,
+    currency: "TND",
+    description: "Rejuvenate your mind and body with yoga, spa treatments, and healthy cuisine in beautiful Bali.",
+    image: "https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?auto=compress&w=600&q=80",
+    category: "wellness",
+    duration: 7
+  },
+  {
+    id: 19,
+    title: "Mediterranean Cruise",
+    location: "Italy, Greece, Spain",
+    price: 9500,
+    currency: "TND",
+    description: "Sail the Mediterranean Sea, stopping at historic ports and enjoying luxury onboard amenities.",
+    image: "https://images.pexels.com/photos/461382/pexels-photo-461382.jpeg?auto=compress&w=600&q=80",
+    category: "cruise",
+    duration: 9
+  },
+  {
+    id: 20,
+    title: "Australian Outback Adventure",
+    location: "Australia",
+    price: 12500,
+    currency: "TND",
+    description: "Explore the rugged beauty of the Australian Outback, from Uluru to the Great Barrier Reef.",
+    image: "https://images.pexels.com/photos/164631/pexels-photo-164631.jpeg?auto=compress&w=600&q=80",
+    category: "adventure",
+    duration: 11
   }
 ];
 

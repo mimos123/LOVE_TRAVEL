@@ -63,10 +63,38 @@ export default function Packages() {
   const [maxPrice, setMaxPrice] = useState(5000);
   const [view, setView] = useState("grid"); // "grid" or "list"
   const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState(null); // "price" | "name" | null
+  const [sortOrder, setSortOrder] = useState("asc"); // "asc" | "desc"
 
   const perPage = 4;
-  const totalPages = Math.ceil(packagesData.length / perPage);
-  const paginatedPackages = packagesData.slice((page - 1) * perPage, page * perPage);
+
+  // Sorting logic
+  let sortedPackages = [...packagesData];
+  if (sortBy === "price") {
+    sortedPackages.sort((a, b) =>
+      sortOrder === "asc" ? a.price - b.price : b.price - a.price
+    );
+  } else if (sortBy === "name") {
+    sortedPackages.sort((a, b) =>
+      sortOrder === "asc"
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title)
+    );
+  }
+
+  const totalPages = Math.ceil(sortedPackages.length / perPage);
+  const paginatedPackages = sortedPackages.slice((page - 1) * perPage, page * perPage);
+
+  // Handler for sort button click
+  const handleSort = (type) => {
+    if (sortBy === type) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(type);
+      setSortOrder("asc");
+    }
+    setPage(1);
+  };
 
   return (
     <>
@@ -95,9 +123,24 @@ export default function Packages() {
             <div className="flex gap-8">
               {/* Price Dropdown */}
               <div className="relative">
-                <button className="flex items-center gap-1 text-white font-medium text-sm focus:outline-none">
+                <button
+                  className={`flex items-center gap-1 text-white font-medium text-sm focus:outline-none ${sortBy === "price" ? "underline" : ""}`}
+                  onClick={() => handleSort("price")}
+                >
                   PRICE
-                  <svg className="w-4 h-4 ml-1 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg
+                    className="w-4 h-4 ml-1 text-white transition-transform duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    style={{
+                      transform:
+                        sortBy === "price" && sortOrder === "desc"
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                    }}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -105,9 +148,24 @@ export default function Packages() {
               </div>
               {/* Name Dropdown */}
               <div className="relative">
-                <button className="flex items-center gap-1 text-white font-medium text-sm focus:outline-none">
+                <button
+                  className={`flex items-center gap-1 text-white font-medium text-sm focus:outline-none ${sortBy === "name" ? "underline" : ""}`}
+                  onClick={() => handleSort("name")}
+                >
                   NAME
-                  <svg className="w-4 h-4 ml-1 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg
+                    className="w-4 h-4 ml-1 text-white transition-transform duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    style={{
+                      transform:
+                        sortBy === "name" && sortOrder === "desc"
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                    }}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -184,12 +242,12 @@ export default function Packages() {
                   <input
                     type="range"
                     min={0}
-                    max={5000}
+                    max={10000}
                     value={maxPrice}
                     onChange={e => setMaxPrice(Number(e.target.value))}
                     className="w-full"
                   />
-                  <span className="text-xs text-gray-500">${maxPrice}</span>
+                  <span className="text-xs text-gray-500">{maxPrice} TND</span>
                 </div>
                 <label className="flex items-center mt-2 text-xs">
                   <input type="checkbox" className="mr-2" />
